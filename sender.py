@@ -31,7 +31,7 @@ class sender:
                 img = cv2.resize(img, (x, y))
                 img_bytes = pickle.dumps(img)
                 self.cilent.send(img_bytes)
-                time.sleep(1 / 1)
+                time.sleep(1 / 15)
 
     def close(self):
         self.cilent.close()

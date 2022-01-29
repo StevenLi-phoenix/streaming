@@ -19,7 +19,7 @@ class Server:
         self.recieve_length = 1024
         atexit.register(self.close)
         self.img_s = None
-        self.rate = [0 for i in range(30)]
+        self.rate = [0 for i in range(100)]
 
     def main(self):
         self.server.listen()
@@ -33,7 +33,7 @@ class Server:
         while True:
             msg = self.conn.recvfrom(100000000)
             if len(msg) is not None:
-                print(f"\r Last recieved: {sum(self.rate)} out of 30", end="\t")
+                print(f"\r Last recieved: {sum(self.rate)} out of {len(self.rate)}", end="\t")
                 # img_s = cv2.imdecode(np.asarray(bytearray(msg), dtype='uint8'), cv2.IMREAD_COLOR)
                 try:
                     img_s = pickle.loads(msg[0])
