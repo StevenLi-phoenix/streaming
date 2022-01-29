@@ -5,6 +5,7 @@ import threading
 import time
 
 import cv2
+import numpy as np
 
 
 class Server:
@@ -18,7 +19,7 @@ class Server:
         self.recieve_length = 1024
         atexit.register(self.close)
         self.img_s = None
-        self.rate = [0 for i in range(100)]
+        self.rate = [0 for i in range(30)]
 
     def main(self):
         self.server.listen()
@@ -32,7 +33,7 @@ class Server:
         while True:
             msg = self.conn.recvfrom(100000000)
             if len(msg) is not None:
-                print(f"\r Last recieved: {sum(self.rate)} out of 100", end="\t")
+                print(f"\r Last recieved: {sum(self.rate)} out of 30", end="\t")
                 # img_s = cv2.imdecode(np.asarray(bytearray(msg), dtype='uint8'), cv2.IMREAD_COLOR)
                 try:
                     img_s = pickle.loads(msg[0])
@@ -77,7 +78,15 @@ if __name__ == '__main__':
         time.sleep(0.1)
     print("Create window")
     while sum(s.rate) > 0:
-        cv2.imshow("remote_pic", s.img_s)
+        pic = s.img_s
+        if np.max(pic) < 50:
+            pic_max = np.max(pic)
+            pic_min = np.min(pic)
+            pic = pic - pic_min
+            pic = pic * (1 / (pic_max - pic_min))
+            # pic = np.array(pic).astype("float32")
+            # pid = cv2.bilateralFilter(pic, 0, 100, 5)
+        cv2.imshow("remote_pic", pic)
         if cv2.waitKey(1) & 0xFF == ord('q'):
             break
     s.close()
